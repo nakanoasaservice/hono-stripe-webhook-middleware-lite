@@ -1,0 +1,6 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "hono-stripe-webhook-middleware-lite",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-11-09"
+}

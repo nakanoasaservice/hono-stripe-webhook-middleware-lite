@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"strict": true,
+		"skipLibCheck": true,
+		"types": ["@cloudflare/vitest-pool-workers"],
+		"lib": ["ESNext"],
+		"jsx": "react-jsx",
+		"jsxImportSource": "hono/jsx",
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
+
+		"erasableSyntaxOnly": true,
+		"forceConsistentCasingInFileNames": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedIndexedAccess": true,
+		"noPropertyAccessFromIndexSignature": true
+	}
+}
