@@ -143,6 +143,39 @@ app.use("/webhook/*", (c, next) => {
 });
 ```
 
+## Advanced: Using without Hono
+
+The core verification functions are framework-agnostic. You can use `verifyHeader` and `importKeyFromWebhookSecret` directly with any framework or runtime that supports the Web Crypto API:
+
+```ts
+import type Stripe from "stripe"; // types only — not bundled
+import {
+  importKeyFromWebhookSecret,
+  verifyHeader,
+} from "@nakanoaas/hono-stripe-webhook-middleware-lite";
+
+const key = await importKeyFromWebhookSecret(process.env.STRIPE_WEBHOOK_SECRET!);
+
+export async function handleWebhook(req: Request): Promise<Response> {
+  const signature = req.headers.get("stripe-signature");
+  if (!signature) {
+    return new Response("Missing signature", { status: 401 });
+  }
+
+  const body = await req.text();
+
+  try {
+    await verifyHeader(body, signature, key);
+  } catch {
+    return new Response("Invalid signature", { status: 401 });
+  }
+
+  const event: Stripe.Event = JSON.parse(body);
+  // handle the verified event
+  return new Response(JSON.stringify({ received: true }), { status: 200 });
+}
+```
+
 ## API
 
 ### `stripeWebhookMiddleware(webhookSecret)`
