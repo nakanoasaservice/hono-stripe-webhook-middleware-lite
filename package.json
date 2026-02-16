@@ -1,6 +1,6 @@
 {
 	"name": "@nakanoaas/hono-stripe-webhook-middleware-lite",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Stripe webhook verification for Hono — without the Stripe SDK",
 	"author": "Nakano as a Service",
 	"license": "Apache-2.0",
