@@ -176,6 +176,24 @@ export async function handleWebhook(req: Request): Promise<Response> {
 }
 ```
 
+## Debugging
+
+When signature verification fails, the middleware throws an `HTTPException` with the underlying error attached as `cause`. You can inspect it in Hono's error handler:
+
+```ts
+import { HTTPException } from "hono/http-exception";
+
+app.onError((error, c) => {
+  if (error instanceof HTTPException) {
+    console.error(error.cause);
+    return error.getResponse();
+  }
+  // ...
+});
+```
+
+Common causes include `SignatureVerificationError` with messages like `"Timestamp outside the tolerance zone"` or `"No signatures found matching the expected signature for payload"`.
+
 ## API
 
 ### `stripeWebhookMiddleware(webhookSecret)`
@@ -197,6 +215,10 @@ Lower-level function for manual signature verification.
 ### `importKeyFromWebhookSecret(webhookSecret)`
 
 Imports a Stripe webhook secret as a Web Crypto `CryptoKey` for HMAC-SHA256 verification.
+
+## Already using the Stripe SDK?
+
+If your project already depends on `stripe` at runtime (e.g. to create charges or manage subscriptions), adding this library won't reduce your bundle — it will only increase it. In that case, use our sister library **[hono-stripe-webhook-middleware](https://github.com/nakanoasaservice/hono-stripe-webhook-middleware)** instead, which delegates signature verification to the Stripe SDK you already ship.
 
 ## License
 
