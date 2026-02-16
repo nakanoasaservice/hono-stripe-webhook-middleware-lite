@@ -143,14 +143,6 @@ app.use("/webhook/*", (c, next) => {
 });
 ```
 
-## Typed Events
-
-As shown in the examples above, you can get full `Stripe.Event` types by installing `stripe` as a **dev dependency**. Since it is imported with `import type`, the Stripe SDK is **never included in your production bundle**:
-
-```sh
-npm install -D stripe
-```
-
 ## API
 
 ### `stripeWebhookMiddleware(webhookSecret)`
