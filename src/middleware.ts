@@ -55,7 +55,7 @@ export function stripeWebhookMiddleware(
 	return async (c, next) => {
 		const header = c.req.header("stripe-signature");
 		if (!header) {
-			throw new HTTPException(401, {
+			throw new HTTPException(400, {
 				message: "Missing stripe-signature header",
 			});
 		}
@@ -65,7 +65,7 @@ export function stripeWebhookMiddleware(
 		try {
 			await verifyHeader(body, header, await cryptoKey);
 		} catch (cause: unknown) {
-			throw new HTTPException(401, {
+			throw new HTTPException(400, {
 				message: "Stripe signature validation failed",
 				cause: cause,
 			});
