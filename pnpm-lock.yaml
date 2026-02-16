@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       hono:
-        specifier: ^4.0.0
+        specifier: '>=4.1.0'
         version: 4.11.9
     devDependencies:
       '@biomejs/biome':

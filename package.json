@@ -1,6 +1,6 @@
 {
 	"name": "@nakanoaas/hono-stripe-webhook-middleware-lite",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "Stripe webhook verification for Hono — without the Stripe SDK",
 	"author": "Nakano as a Service",
 	"license": "Apache-2.0",
@@ -47,7 +47,7 @@
 		"test": "vitest"
 	},
 	"peerDependencies": {
-		"hono": "^4.0.0"
+		"hono": ">=4.1.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.4.0",
