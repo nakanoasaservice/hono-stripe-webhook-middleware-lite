@@ -6,6 +6,41 @@ import { verifyHeader } from "./verify";
 
 class StripeWebhookMiddlewareInitializationError extends Error {}
 
+/**
+ * Creates a Hono middleware that verifies Stripe webhook signatures using the
+ * Web Crypto API.
+ *
+ * The middleware validates the `stripe-signature` header on every incoming
+ * request and throws an `HTTPException` (401) when the signature is missing or
+ * invalid. The crypto key is derived once at initialization time and reused
+ * across requests.
+ *
+ * @param webhookSecret - The Stripe webhook signing secret (must match
+ *   `whsec_[a-zA-Z0-9]+`)
+ * @returns A Hono {@link MiddlewareHandler}
+ * @throws {@link StripeWebhookMiddlewareInitializationError} If the secret
+ *   format is invalid
+ *
+ * @example
+ * ```ts
+ * import { Hono } from "hono";
+ * import { env } from "cloudflare:workers";
+ * import Stripe from "stripe";
+ * import { stripeWebhookMiddleware } from "@nakanoaas/hono-stripe-webhook-middleware-lite";
+ *
+ * const app = new Hono();
+ *
+ * app.post(
+ *   "/webhook",
+ *   stripeWebhookMiddleware(env.STRIPE_WEBHOOK_SECRET),
+ *   async (c) => {
+ *     const event = await c.req.json<Stripe.Event>();
+ *     // handle the verified Stripe event
+ *     return c.json({ received: true });
+ *   },
+ * );
+ * ```
+ */
 export function stripeWebhookMiddleware(
 	webhookSecret: string,
 ): MiddlewareHandler {

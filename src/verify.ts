@@ -1,7 +1,29 @@
 import { encoder } from "./encoder";
 
+/**
+ * Error thrown when Stripe webhook signature verification fails.
+ *
+ * This can occur when:
+ * - The signature header is missing or malformed
+ * - The timestamp is outside the tolerance window (replay attack protection)
+ * - No signature matches the expected HMAC digest
+ */
 export class SignatureVerificationError extends Error {}
 
+/**
+ * Verifies a Stripe webhook signature header against the request payload
+ * using the Web Crypto API.
+ *
+ * @param payload - The raw request body as a string or {@link BufferSource}
+ * @param signatureHeader - The value of the `stripe-signature` HTTP header
+ * @param key - A {@link CryptoKey} derived from the webhook secret
+ *   (see {@link importKeyFromWebhookSecret})
+ * @param tolerance - Maximum allowed age of the timestamp in seconds
+ *   (defaults to `300`, i.e. 5 minutes)
+ * @param receivedAt - The time the request was received in milliseconds since
+ *   epoch (defaults to `Date.now()`)
+ * @throws {@link SignatureVerificationError} If verification fails
+ */
 export async function verifyHeader(
 	payload: string | BufferSource,
 	signatureHeader: string,
