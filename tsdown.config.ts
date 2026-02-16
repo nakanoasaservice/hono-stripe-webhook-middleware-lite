@@ -18,9 +18,6 @@ export default defineConfig({
 				name: string;
 				version: string;
 				license: string;
-				peerDependencies: {
-					hono: string;
-				};
 			};
 
 			await writeFile(
@@ -35,7 +32,7 @@ export default defineConfig({
 							include: ["src", "README.md", "LICENSE"],
 						},
 						imports: {
-							hono: `jsr:@hono/hono@${packageJson.peerDependencies.hono}`,
+							hono: `jsr:@hono/hono@^4.1.0`,
 						},
 					},
 					null,
