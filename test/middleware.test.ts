@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import Stripe from "stripe";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { stripeWebhookMiddleware } from "../src/middleware.ts";
 
@@ -36,27 +36,34 @@ describe("stripeWebhookMiddleware", () => {
 	});
 
 	it("should 400 when the webhook signature is missing", async () => {
-		const app = new Hono().post("/", stripeWebhookMiddleware(SECRET), (c) =>
-			c.body(null, 200),
-		);
+		const mockFn = vi.fn();
+
+		const app = new Hono().post("/", stripeWebhookMiddleware(SECRET), (c) => {
+			mockFn(c);
+			return c.body(null, 200);
+		});
 
 		const response = await app.request("/", {
 			method: "POST",
 			body: EVENT_PAYLOAD_BYTES,
 		});
 		expect(response.status).toBe(400);
+		expect(mockFn).not.toHaveBeenCalled();
 	});
 
 	it("should 400 when the webhook signature is invalid", async () => {
+		const mockFn = vi.fn();
+
 		const header = await Stripe.webhooks.generateTestHeaderStringAsync({
 			payload: EVENT_PAYLOAD_STRING,
 			secret: SECRET,
 			signature: "bad_signature",
 		});
 
-		const app = new Hono().post("/", stripeWebhookMiddleware(SECRET), (c) =>
-			c.body(null, 200),
-		);
+		const app = new Hono().post("/", stripeWebhookMiddleware(SECRET), (c) => {
+			mockFn(c);
+			return c.body(null, 200);
+		});
 
 		const response = await app.request("/", {
 			method: "POST",
@@ -66,6 +73,7 @@ describe("stripeWebhookMiddleware", () => {
 			body: EVENT_PAYLOAD_BYTES,
 		});
 		expect(response.status).toBe(400);
+		expect(mockFn).not.toHaveBeenCalled();
 	});
 
 	it("should 200 when the webhook signature is valid", async () => {
