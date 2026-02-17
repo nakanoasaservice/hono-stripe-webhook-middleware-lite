@@ -37,3 +37,14 @@ jobs:
 
       - name: Run Tests
         run: pnpm run test
+
+      - name: Run build
+        run: pnpm run build
+
+      - name: Check for uncommitted changes after build
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Uncommitted changes detected after build:"
+            git status
+            exit 1
+          fi
