@@ -27,10 +27,6 @@ jobs:
         uses: voidzero-dev/setup-vp@v1.22.0
         with:
           cache: true
-          run-install: false
-
-      - name: Install locked dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Build
         run: pnpm build
