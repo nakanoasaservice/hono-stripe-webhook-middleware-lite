@@ -13,9 +13,7 @@ export class WebhookSecretImportError extends Error {}
  * @returns A {@link CryptoKey} configured for HMAC-SHA256 verification
  * @throws {@link WebhookSecretImportError} If the key import fails
  */
-export async function importKeyFromWebhookSecret(
-	webhookSecret: string,
-): Promise<CryptoKey> {
+export async function importKeyFromWebhookSecret(webhookSecret: string): Promise<CryptoKey> {
 	try {
 		const keyBytes = encoder.encode(webhookSecret);
 

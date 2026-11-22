@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
 import { importKeyFromWebhookSecret } from "../src/key.ts";
 import { verifyHeader } from "../src/verify.ts";
@@ -18,31 +18,26 @@ describe("validateSignature", async () => {
 	it("should raise a SignatureVerificationError when the header does not have the expected format", async () => {
 		const header = "I'm not even a real signature header";
 
-		const expectedMessage =
-			/Unable to extract timestamp and signatures from header/;
+		const expectedMessage = /Unable to extract timestamp and signatures from header/;
 
-		await expect(
-			verifyHeader(EVENT_PAYLOAD_BYTES, header, SECRET_KEY),
-		).rejects.toThrow(expectedMessage);
+		await expect(verifyHeader(EVENT_PAYLOAD_BYTES, header, SECRET_KEY)).rejects.toThrow(
+			expectedMessage,
+		);
 	});
 
 	it("should raise a SignatureVerificationError when the header is null or empty", async () => {
 		const expectedMessage = /No stripe-signature header value was provided/;
 
-		await expect(
-			verifyHeader(EVENT_PAYLOAD_BYTES, "", SECRET_KEY),
-		).rejects.toThrow(expectedMessage);
+		await expect(verifyHeader(EVENT_PAYLOAD_BYTES, "", SECRET_KEY)).rejects.toThrow(
+			expectedMessage,
+		);
 
 		await expect(
 			verifyHeader(EVENT_PAYLOAD_BYTES, null as unknown as string, SECRET_KEY),
 		).rejects.toThrow(expectedMessage);
 
 		await expect(
-			verifyHeader(
-				EVENT_PAYLOAD_BYTES,
-				undefined as unknown as string,
-				SECRET_KEY,
-			),
+			verifyHeader(EVENT_PAYLOAD_BYTES, undefined as unknown as string, SECRET_KEY),
 		).rejects.toThrow(expectedMessage);
 	});
 
@@ -52,9 +47,9 @@ describe("validateSignature", async () => {
 			payload: EVENT_PAYLOAD_STRING,
 			scheme: "v0",
 		});
-		await expect(
-			verifyHeader(EVENT_PAYLOAD_BYTES, header, SECRET_KEY),
-		).rejects.toThrow(/No signatures found with expected scheme/);
+		await expect(verifyHeader(EVENT_PAYLOAD_BYTES, header, SECRET_KEY)).rejects.toThrow(
+			/No signatures found with expected scheme/,
+		);
 	});
 
 	it("should raise a SignatureVerificationError when there are no valid signatures for the payload", async () => {
@@ -64,9 +59,7 @@ describe("validateSignature", async () => {
 			signature: "bad_signature",
 		});
 
-		await expect(
-			verifyHeader(EVENT_PAYLOAD_BYTES, header, SECRET_KEY),
-		).rejects.toThrow(
+		await expect(verifyHeader(EVENT_PAYLOAD_BYTES, header, SECRET_KEY)).rejects.toThrow(
 			/No signatures found matching the expected signature for payload/,
 		);
 	});
@@ -91,9 +84,9 @@ describe("validateSignature", async () => {
 			secret: SECRET,
 		});
 
-		await expect(
-			verifyHeader(EVENT_PAYLOAD_BYTES, header, SECRET_KEY, 10),
-		).rejects.toThrow(/Timestamp outside the tolerance zone/);
+		await expect(verifyHeader(EVENT_PAYLOAD_BYTES, header, SECRET_KEY, 10)).rejects.toThrow(
+			/Timestamp outside the tolerance zone/,
+		);
 	});
 
 	it("should resolve when the header contains a valid signature and the timestamp is within the tolerance of Date.now()", async () => {
@@ -129,9 +122,7 @@ describe("validateSignature", async () => {
 		});
 		header += ",v1=potato";
 
-		await expect(
-			verifyHeader(EVENT_PAYLOAD_BYTES, header, SECRET_KEY, 10),
-		).resolves.not.toThrow();
+		await expect(verifyHeader(EVENT_PAYLOAD_BYTES, header, SECRET_KEY, 10)).resolves.not.toThrow();
 	});
 
 	it("should raise a SignatureVerificationError when the header contains a valid signature and the timestamp is off but no tolerance is provided", async () => {
@@ -144,9 +135,9 @@ describe("validateSignature", async () => {
 			secret: SECRET,
 		});
 
-		await expect(
-			verifyHeader(EVENT_PAYLOAD_BYTES, header, SECRET_KEY),
-		).rejects.toThrow(/Timestamp outside the tolerance zone/);
+		await expect(verifyHeader(EVENT_PAYLOAD_BYTES, header, SECRET_KEY)).rejects.toThrow(
+			/Timestamp outside the tolerance zone/,
+		);
 	});
 
 	it("should accept Buffer instances for the payload", async () => {
@@ -167,15 +158,11 @@ describe("validateSignature", async () => {
 			secret: SECRET,
 		});
 
-		await expect(
-			verifyHeader({} as Uint8Array, header, SECRET_KEY),
-		).rejects.toThrow(
+		await expect(verifyHeader({} as Uint8Array, header, SECRET_KEY)).rejects.toThrow(
 			/Webhook payload must be provided as a string or a Buffer/,
 		);
 		await expect(
 			verifyHeader(new Date() as unknown as Uint8Array, header, SECRET_KEY),
-		).rejects.toThrow(
-			/Webhook payload must be provided as a string or a Buffer/,
-		);
+		).rejects.toThrow(/Webhook payload must be provided as a string or a Buffer/);
 	});
 });

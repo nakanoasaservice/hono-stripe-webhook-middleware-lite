@@ -23,25 +23,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v5
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1.22.0
         with:
-          run_install: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - name: Install Dependencies
-        run: pnpm install
+          cache: true
 
       - name: Build
         run: pnpm build
 
       - name: Publish to JSR
-        run: pnpm dlx jsr publish
+        run: pnpm exec jsr publish
 
       - name: Publish to npm
         run: pnpm publish

@@ -35,27 +35,16 @@ export async function verifyHeader(
 
 	const timestampAge = Math.floor(receivedAt / 1000) - parsedHeader.timestamp;
 	if (timestampAge > tolerance) {
-		throw new SignatureVerificationError(
-			"Timestamp outside the tolerance zone",
-		);
+		throw new SignatureVerificationError("Timestamp outside the tolerance zone");
 	}
 
 	const messageBytes = encoder.encode(
-		`${parsedHeader.timestamp}.${
-			typeof payload === "string" ? payload : decodePayload(payload)
-		}`,
+		`${parsedHeader.timestamp}.${typeof payload === "string" ? payload : decodePayload(payload)}`,
 	);
 
 	for (const sig of parsedHeader.signatures) {
-		const sigBytes = new Uint8Array(
-			sig.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) ?? [],
-		);
-		const isValid = await crypto.subtle.verify(
-			"HMAC",
-			key,
-			sigBytes,
-			messageBytes,
-		);
+		const sigBytes = new Uint8Array(sig.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16)) ?? []);
+		const isValid = await crypto.subtle.verify("HMAC", key, sigBytes, messageBytes);
 		if (isValid) return;
 	}
 
@@ -71,9 +60,7 @@ type WebhookParsedHeader = {
 
 function parseHeader(header: string, scheme: string): WebhookParsedHeader {
 	if (!header) {
-		throw new SignatureVerificationError(
-			"No stripe-signature header value was provided",
-		);
+		throw new SignatureVerificationError("No stripe-signature header value was provided");
 	}
 
 	const parsedHeader = header.split(",").reduce<WebhookParsedHeader>(
@@ -97,15 +84,11 @@ function parseHeader(header: string, scheme: string): WebhookParsedHeader {
 	);
 
 	if (parsedHeader.timestamp === -1) {
-		throw new SignatureVerificationError(
-			"Unable to extract timestamp and signatures from header",
-		);
+		throw new SignatureVerificationError("Unable to extract timestamp and signatures from header");
 	}
 
 	if (!parsedHeader.signatures.length) {
-		throw new SignatureVerificationError(
-			"No signatures found with expected scheme",
-		);
+		throw new SignatureVerificationError("No signatures found with expected scheme");
 	}
 
 	return parsedHeader;
