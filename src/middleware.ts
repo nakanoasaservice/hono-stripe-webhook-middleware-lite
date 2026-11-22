@@ -41,9 +41,7 @@ class StripeWebhookMiddlewareInitializationError extends Error {}
  * );
  * ```
  */
-export function stripeWebhookMiddleware(
-	webhookSecret: string,
-): MiddlewareHandler {
+export function stripeWebhookMiddleware(webhookSecret: string): MiddlewareHandler {
 	if (!/^whsec_[a-zA-Z0-9]+$/.test(webhookSecret)) {
 		throw new StripeWebhookMiddlewareInitializationError(
 			"The provided signing secret is not a valid webhook secret",

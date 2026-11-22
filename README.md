@@ -46,15 +46,11 @@ import { stripeWebhookMiddleware } from "@nakanoaas/hono-stripe-webhook-middlewa
 
 const app = new Hono();
 
-app.post(
-  "/webhook",
-  stripeWebhookMiddleware(env.STRIPE_WEBHOOK_SECRET),
-  async (c) => {
-    const event = await c.req.json<Stripe.Event>();
-    // event is verified — handle it
-    return c.json({ received: true });
-  },
-);
+app.post("/webhook", stripeWebhookMiddleware(env.STRIPE_WEBHOOK_SECRET), async (c) => {
+	const event = await c.req.json<Stripe.Event>();
+	// event is verified — handle it
+	return c.json({ received: true });
+});
 
 export default app;
 ```
@@ -71,14 +67,10 @@ import { stripeWebhookMiddleware } from "@nakanoaas/hono-stripe-webhook-middlewa
 
 const app = new Hono();
 
-app.post(
-  "/webhook",
-  stripeWebhookMiddleware(process.env.STRIPE_WEBHOOK_SECRET!),
-  async (c) => {
-    const event = await c.req.json<Stripe.Event>();
-    return c.json({ received: true });
-  },
-);
+app.post("/webhook", stripeWebhookMiddleware(process.env.STRIPE_WEBHOOK_SECRET!), async (c) => {
+	const event = await c.req.json<Stripe.Event>();
+	return c.json({ received: true });
+});
 
 serve(app);
 ```
@@ -92,14 +84,10 @@ import { stripeWebhookMiddleware } from "@nakanoaas/hono-stripe-webhook-middlewa
 
 const app = new Hono();
 
-app.post(
-  "/webhook",
-  stripeWebhookMiddleware(Deno.env.get("STRIPE_WEBHOOK_SECRET")!),
-  async (c) => {
-    const event = await c.req.json<Stripe.Event>();
-    return c.json({ received: true });
-  },
-);
+app.post("/webhook", stripeWebhookMiddleware(Deno.env.get("STRIPE_WEBHOOK_SECRET")!), async (c) => {
+	const event = await c.req.json<Stripe.Event>();
+	return c.json({ received: true });
+});
 
 Deno.serve(app.fetch);
 ```
@@ -113,14 +101,10 @@ import { stripeWebhookMiddleware } from "@nakanoaas/hono-stripe-webhook-middlewa
 
 const app = new Hono();
 
-app.post(
-  "/webhook",
-  stripeWebhookMiddleware(process.env.STRIPE_WEBHOOK_SECRET!),
-  async (c) => {
-    const event = await c.req.json<Stripe.Event>();
-    return c.json({ received: true });
-  },
-);
+app.post("/webhook", stripeWebhookMiddleware(process.env.STRIPE_WEBHOOK_SECRET!), async (c) => {
+	const event = await c.req.json<Stripe.Event>();
+	return c.json({ received: true });
+});
 
 export default app;
 ```
@@ -138,8 +122,8 @@ type Env = { Bindings: { STRIPE_WEBHOOK_SECRET: string } };
 const app = new Hono<Env>();
 
 app.use("/webhook/*", (c, next) => {
-  const middleware = stripeWebhookMiddleware(c.env.STRIPE_WEBHOOK_SECRET);
-  return middleware(c, next);
+	const middleware = stripeWebhookMiddleware(c.env.STRIPE_WEBHOOK_SECRET);
+	return middleware(c, next);
 });
 ```
 
@@ -150,29 +134,29 @@ The core verification functions are framework-agnostic. You can use `verifyHeade
 ```ts
 import type Stripe from "stripe"; // types only — not bundled
 import {
-  importKeyFromWebhookSecret,
-  verifyHeader,
+	importKeyFromWebhookSecret,
+	verifyHeader,
 } from "@nakanoaas/hono-stripe-webhook-middleware-lite";
 
 const key = await importKeyFromWebhookSecret(process.env.STRIPE_WEBHOOK_SECRET!);
 
 export async function handleWebhook(req: Request): Promise<Response> {
-  const signature = req.headers.get("stripe-signature");
-  if (!signature) {
-    return new Response("Missing signature", { status: 401 });
-  }
+	const signature = req.headers.get("stripe-signature");
+	if (!signature) {
+		return new Response("Missing signature", { status: 401 });
+	}
 
-  const body = await req.text();
+	const body = await req.text();
 
-  try {
-    await verifyHeader(body, signature, key);
-  } catch {
-    return new Response("Invalid signature", { status: 401 });
-  }
+	try {
+		await verifyHeader(body, signature, key);
+	} catch {
+		return new Response("Invalid signature", { status: 401 });
+	}
 
-  const event: Stripe.Event = JSON.parse(body);
-  // handle the verified event
-  return new Response(JSON.stringify({ received: true }), { status: 200 });
+	const event: Stripe.Event = JSON.parse(body);
+	// handle the verified event
+	return new Response(JSON.stringify({ received: true }), { status: 200 });
 }
 ```
 
@@ -184,11 +168,11 @@ When signature verification fails, the middleware throws an `HTTPException` with
 import { HTTPException } from "hono/http-exception";
 
 app.onError((error, c) => {
-  if (error instanceof HTTPException) {
-    console.error(error.cause);
-    return error.getResponse();
-  }
-  // ...
+	if (error instanceof HTTPException) {
+		console.error(error.cause);
+		return error.getResponse();
+	}
+	// ...
 });
 ```
 
@@ -223,3 +207,11 @@ If your project already depends on `stripe` at runtime (e.g. to create charges o
 ## License
 
 Apache-2.0
+
+## Development
+
+Use Node.js 24 and the pnpm version pinned in `package.json`.
+Run `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm test`, and `pnpm build`.
+Vite+ provides formatting, linting, type checks, tests and packaging. Tests
+continue to run in the Cloudflare Workers runtime. Library builds retain
+ESM, CommonJS, declaration files and source maps.

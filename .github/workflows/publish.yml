@@ -23,25 +23,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v5
+      - name: Setup Vite+
+        uses: voidzero-dev/setup-vp@v1.22.0
         with:
-          run_install: false
+          version: "1.7.0"
+          node-version-file: .node-version
+          cache: true
+          run-install: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - name: Install Dependencies
-        run: pnpm install
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Build
         run: pnpm build
 
       - name: Publish to JSR
-        run: pnpm dlx jsr publish
+        run: pnpm exec jsr publish
 
       - name: Publish to npm
         run: pnpm publish
